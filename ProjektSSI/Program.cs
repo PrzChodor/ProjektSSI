@@ -15,6 +15,7 @@ namespace ProjektSSI
             data.LoadData();
 
             Network network = new Network(1024, new int []{ 512, 256, 128, 64 }, 26, 0.05, 0.99);
+            network.LoadWeights();
             network.Train(data, 0.1);
             Console.ReadKey();
         }

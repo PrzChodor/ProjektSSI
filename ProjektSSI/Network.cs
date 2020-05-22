@@ -96,13 +96,13 @@ namespace ProjektSSI
                     return;
                 }
 
+                lastWeights = CurrentWeights();
+                lowestError = currentError;
+
                 Console.WriteLine();
                 Console.WriteLine($"   End of epoch {i + 1}");
                 Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
                 Console.WriteLine($"   RMSE = {lowestError[1]}");
-
-                lastWeights = CurrentWeights();
-                lowestError = currentError;
             }
 
             SaveWeights(lastWeights);
@@ -155,13 +155,14 @@ namespace ProjektSSI
                     return;
                 }
 
+                lastWeights = CurrentWeights();
+                lowestError = currentError;
+
                 Console.WriteLine();
                 Console.WriteLine($"   End of epoch {epoch}");
                 Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
                 Console.WriteLine($"   RMSE = {lowestError[1]}");
 
-                lastWeights = CurrentWeights();
-                lowestError = currentError;
                 epoch++;
             }
             SaveWeights(lastWeights);
