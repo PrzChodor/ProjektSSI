@@ -57,8 +57,8 @@ namespace ProjektSSI
         //Uczenie sieci z zadaną ilością epok lub dopóki błąd się nie zwiększa
         public void Train(Data dataSet, int numEpochs)
         {
-            var lowestError = Test(dataSet);
             var lastWeights = CurrentWeights();
+            var lowestError = Test(dataSet);
 
             Console.WriteLine();
             Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
@@ -115,12 +115,11 @@ namespace ProjektSSI
         //Uczenie sieci do uzyskania odpowiednio małego błedu lub dopóki błąd się nie zwiększa
         public void Train(Data dataSet, double maximumError)
         {
+            var lastWeights = CurrentWeights();
             var lowestError = Test(dataSet);
             int epoch = 1;
-            var lastWeights = CurrentWeights();
 
             Console.WriteLine();
-            Console.WriteLine($"   End of epoch {epoch}");
             Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
             Console.WriteLine($"   RMSE = {lowestError[1]}");
 
@@ -321,10 +320,10 @@ namespace ProjektSSI
             }
         }
 
-        //Ustalenie ścieżki dla poszczególnych sieci jako "../../Data/weights(ilość neuronów poszczególnych warstw).data"
+        //Ustalenie ścieżki dla poszczególnych sieci jako "../../data/weights(ilość neuronów poszczególnych warstw).data"
         private string GetPath()
         {
-            string path = @"../../Data/weights(";
+            string path = @"../../data/weights(";
 
             path += InputLayer.Count.ToString() + "-";
             foreach (var layer in HiddenLayers)
