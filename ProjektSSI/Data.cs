@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using ShellProgressBar;
 
 namespace ProjektSSI
 {
@@ -22,46 +23,59 @@ namespace ProjektSSI
         //Wczytywanie danych z pliku
         public void LoadData()
         {
-            var imagesLearnList = new List<double[]>();
+            int totalTicks = 26000;
 
-            var directories = Directory.GetDirectories(@"../../learning");
-            foreach (var d in directories)
+            var options = new ProgressBarOptions
             {
-                var letter = Path.GetFileName(d);
-                var letterNorm = new double[26];
-                int n = Encoding.ASCII.GetBytes(letter)[0] - 65;
-                letterNorm[n]= 1;
-                
-                var files = Directory.GetFiles(d);
-                foreach (var f in files)
-                {
-                    imagesLearnList.Add(ConvertImage(f, letterNorm));
-                }
-            }
+                ProgressCharacter = '─',
+                ProgressBarOnBottom = true
+            };
 
-            var imagesTestList = new List<double[]>();
-
-            directories = Directory.GetDirectories(@"../../test");
-            foreach (var d in directories)
+            using (var pbar = new ProgressBar(totalTicks, "Creating data...", options))
             {
-                var letter = Path.GetFileName(d);
-                var letterNorm = new double[26];
-                int n = Encoding.ASCII.GetBytes(letter)[0] - 65;
-                letterNorm[n] = 1;
+                var imagesLearnList = new List<double[]>();
 
-                var files = Directory.GetFiles(d);
-                foreach (var f in files)
+                var directories = Directory.GetDirectories(@"../../learning");
+                foreach (var d in directories)
                 {
-                    imagesTestList.Add(ConvertImage(f,letterNorm));
+                    var letter = Path.GetFileName(d);
+                    var letterNorm = new double[26];
+                    int n = Encoding.ASCII.GetBytes(letter)[0] - 65;
+                    letterNorm[n] = 1;
+
+                    var files = Directory.GetFiles(d);
+                    foreach (var f in files)
+                    {
+                        imagesLearnList.Add(ConvertImage(f, letterNorm));
+                        pbar.Tick();
+                    }
                 }
+
+                var imagesTestList = new List<double[]>();
+
+                directories = Directory.GetDirectories(@"../../test");
+                foreach (var d in directories)
+                {
+                    var letter = Path.GetFileName(d);
+                    var letterNorm = new double[26];
+                    int n = Encoding.ASCII.GetBytes(letter)[0] - 65;
+                    letterNorm[n] = 1;
+
+                    var files = Directory.GetFiles(d);
+                    foreach (var f in files)
+                    {
+                        imagesTestList.Add(ConvertImage(f, letterNorm));
+                        pbar.Tick();
+                    }
+                }
+
+                var imagesLearn = imagesLearnList.ToArray();
+                var imagesTest = imagesTestList.ToArray();
+
+                Shuffle(imagesLearn);
+                Shuffle(imagesTest);
+                Split(imagesLearn, imagesTest);
             }
-
-            var imagesLearn = imagesLearnList.ToArray();
-            var imagesTest = imagesTestList.ToArray();
-
-            Shuffle(imagesLearn);
-            Shuffle(imagesTest);
-            Split(imagesLearn, imagesTest);
         }
 
         public double[] ConvertImage(string file, double [] letterNorm)

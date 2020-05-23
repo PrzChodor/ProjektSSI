@@ -63,6 +63,7 @@ namespace ProjektSSI
             Console.WriteLine();
             Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
             Console.WriteLine($"   RMSE = {lowestError[1]}");
+            Console.WriteLine();
 
             for (var i = 0; i < numEpochs; i++)
             {
@@ -91,18 +92,21 @@ namespace ProjektSSI
                     SaveWeights(lastWeights);
                     Console.WriteLine();
                     Console.WriteLine($"   End of epoch {i + 1}");
-                    Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
-                    Console.WriteLine($"   RMSE = {lowestError[1]}");
-                    return;
+                    Console.WriteLine($"   Accuracy = {currentError[0] * 100:F4}%");
+                    Console.WriteLine($"   RMSE = {currentError[1]}");
+                    LoadWeights();
+                    break;
                 }
 
                 lastWeights = CurrentWeights();
                 lowestError = currentError;
 
+                SaveWeights(lastWeights);
                 Console.WriteLine();
                 Console.WriteLine($"   End of epoch {i + 1}");
                 Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
                 Console.WriteLine($"   RMSE = {lowestError[1]}");
+                Console.WriteLine();
             }
 
             SaveWeights(lastWeights);
@@ -122,6 +126,7 @@ namespace ProjektSSI
             Console.WriteLine();
             Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
             Console.WriteLine($"   RMSE = {lowestError[1]}");
+            Console.WriteLine();
 
             while (maximumError < lowestError[1])
             {
@@ -163,6 +168,7 @@ namespace ProjektSSI
                 Console.WriteLine($"   End of epoch {epoch}");
                 Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
                 Console.WriteLine($"   RMSE = {lowestError[1]}");
+                Console.WriteLine();
 
                 epoch++;
             }
@@ -265,7 +271,6 @@ namespace ProjektSSI
         {
             using (StreamWriter file = new StreamWriter(GetPath(), false))
             {
-                Console.WriteLine("sss");
                 int totalTicks = weights.Count;
 
                 var options = new ProgressBarOptions
@@ -273,14 +278,12 @@ namespace ProjektSSI
                     ProgressCharacter = '─',
                     ProgressBarOnBottom = true
                 };
-                using (var pbar = new ProgressBar(totalTicks, "Saving: Step 0 of " + totalTicks, options))
+                using (var pbar = new ProgressBar(totalTicks, "Saving", options))
                 {
-                    int i = 0;
                     foreach (var item in weights)
                     {
                         file.WriteLine(item);
-                        pbar.Tick("Saving: Step 0 of " + i);
-                        i++;
+                        pbar.Tick();
                     }
                 }
             }
@@ -318,7 +321,6 @@ namespace ProjektSSI
             }
             catch (Exception e)
             {
-                Console.WriteLine("The file could not be read:");
                 Console.WriteLine(e.Message);
             }
         }
