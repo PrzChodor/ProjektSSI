@@ -158,6 +158,7 @@ namespace ProjektSSI
                 lastWeights = CurrentWeights();
                 lowestError = currentError;
 
+                SaveWeights(lastWeights);
                 Console.WriteLine();
                 Console.WriteLine($"   End of epoch {epoch}");
                 Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
@@ -262,8 +263,9 @@ namespace ProjektSSI
         //Zapisywanie wag
         public void SaveWeights(List<double> weights)
         {
-            using (StreamWriter file = new StreamWriter(GetPath()))
+            using (StreamWriter file = new StreamWriter(GetPath(), false))
             {
+                Console.WriteLine("sss");
                 int totalTicks = weights.Count;
 
                 var options = new ProgressBarOptions
