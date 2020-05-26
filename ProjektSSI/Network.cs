@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using ShellProgressBar;
+using System.Globalization;
 
 namespace ProjektSSI
 {
@@ -311,20 +312,20 @@ namespace ProjektSSI
                     {
                         foreach (var neuron in layer)
                         {
-                            neuron.Bias = Convert.ToDouble(file.ReadLine());
+                            neuron.Bias = Convert.ToDouble(file.ReadLine(), CultureInfo.InvariantCulture);
                             foreach (var synapse in neuron.InputSynapses)
                             {
-                                synapse.Weight = Convert.ToDouble(file.ReadLine());
+                                synapse.Weight = Convert.ToDouble(file.ReadLine(), CultureInfo.InvariantCulture);
                             }
                         }
                     }
 
                     foreach (var neuron in OutputLayer)
                     {
-                        neuron.Bias = Convert.ToDouble(file.ReadLine());
+                        neuron.Bias = Convert.ToDouble(file.ReadLine(), CultureInfo.InvariantCulture);
                         foreach (var synapse in neuron.InputSynapses)
                         {
-                            synapse.Weight = Convert.ToDouble(file.ReadLine());
+                            synapse.Weight = Convert.ToDouble(file.ReadLine(), CultureInfo.InvariantCulture);
                         }
                     }
                 }
