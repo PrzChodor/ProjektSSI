@@ -159,7 +159,7 @@ namespace ProjektSSI
                     Console.WriteLine($"   RMSE = {lowestError[1]}");
                     LoadWeights();
                     errors++;
-                    if (errors == 15)
+                    if (errors == 2)
                     {
                         errors = 0;
                         LearningRate /= 10;
@@ -338,7 +338,7 @@ namespace ProjektSSI
         //Ustalenie ścieżki dla poszczególnych sieci jako "../../data/weights(ilość neuronów poszczególnych warstw).data"
         private string GetPath()
         {
-            string path = @"../../data/weights(";
+            string path = (@"../../../data/weights(");
 
             path += InputLayer.Count.ToString() + "-";
             foreach (var layer in HiddenLayers)

@@ -23,8 +23,8 @@ namespace ProjektSSI
         //Wczytywanie danych z pliku
         public void LoadData()
         {
-            int totalTicks = Directory.GetFiles(@"../../data/train", "*.png", SearchOption.AllDirectories).Length;
-            totalTicks += Directory.GetFiles(@"../../data/test", "*.png", SearchOption.AllDirectories).Length;
+            int totalTicks = Directory.GetFiles(@"../../../data/train", "*.png", SearchOption.AllDirectories).Length;
+            totalTicks += Directory.GetFiles(@"../../../data/test", "*.png", SearchOption.AllDirectories).Length;
 
             var options = new ProgressBarOptions
             {
@@ -36,7 +36,7 @@ namespace ProjektSSI
             {
                 var imagesLearnList = new List<double[]>();
 
-                var directories = Directory.GetDirectories(@"../../data/train");
+                var directories = Directory.GetDirectories(@"../../../data/train");
                 foreach (var d in directories)
                 {
                     var letter = Path.GetFileName(d);
@@ -58,7 +58,7 @@ namespace ProjektSSI
 
                 var imagesTestList = new List<double[]>();
 
-                directories = Directory.GetDirectories(@"../../data/test");
+                directories = Directory.GetDirectories(@"../../../data/test");
                 foreach (var d in directories)
                 {
                     var letter = Path.GetFileName(d);
