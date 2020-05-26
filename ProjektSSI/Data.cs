@@ -23,7 +23,8 @@ namespace ProjektSSI
         //Wczytywanie danych z pliku
         public void LoadData()
         {
-            int totalTicks = 26000;
+            int totalTicks = Directory.GetFiles(@"../../data/train", "*.png", SearchOption.AllDirectories).Length;
+            totalTicks += Directory.GetFiles(@"../../data/test", "*.png", SearchOption.AllDirectories).Length;
 
             var options = new ProgressBarOptions
             {
@@ -35,7 +36,7 @@ namespace ProjektSSI
             {
                 var imagesLearnList = new List<double[]>();
 
-                var directories = Directory.GetDirectories(@"../../learning");
+                var directories = Directory.GetDirectories(@"../../data/train");
                 foreach (var d in directories)
                 {
                     var letter = Path.GetFileName(d);
@@ -46,14 +47,18 @@ namespace ProjektSSI
                     var files = Directory.GetFiles(d);
                     foreach (var f in files)
                     {
-                        imagesLearnList.Add(ConvertImage(f, letterNorm));
+                        var imageNorm = ConvertImage(f);
+                        var originalLength = imageNorm.Length;
+                        Array.Resize<double>(ref imageNorm, originalLength + letterNorm.Length);
+                        Array.Copy(letterNorm, 0, imageNorm, originalLength, letterNorm.Length);
+                        imagesLearnList.Add(imageNorm);
                         pbar.Tick();
                     }
                 }
 
                 var imagesTestList = new List<double[]>();
 
-                directories = Directory.GetDirectories(@"../../test");
+                directories = Directory.GetDirectories(@"../../data/test");
                 foreach (var d in directories)
                 {
                     var letter = Path.GetFileName(d);
@@ -64,7 +69,11 @@ namespace ProjektSSI
                     var files = Directory.GetFiles(d);
                     foreach (var f in files)
                     {
-                        imagesTestList.Add(ConvertImage(f, letterNorm));
+                        var imageNorm = ConvertImage(f);
+                        var originalLength = imageNorm.Length;
+                        Array.Resize<double>(ref imageNorm, originalLength + letterNorm.Length);
+                        Array.Copy(letterNorm, 0, imageNorm, originalLength, letterNorm.Length);
+                        imagesTestList.Add(imageNorm);
                         pbar.Tick();
                     }
                 }
@@ -78,10 +87,10 @@ namespace ProjektSSI
             }
         }
 
-        public double[] ConvertImage(string file, double [] letterNorm)
+        public double[] ConvertImage(string file)
         {
             var image = new Bitmap(file);
-            var imageNorm = new double[1024];
+            var imageNorm = new double[784];
 
             BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
                 ImageLockMode.ReadWrite, image.PixelFormat);
@@ -100,9 +109,6 @@ namespace ProjektSSI
 
             image.UnlockBits(bitmapData);
 
-            var originalLength = imageNorm.Length;
-            Array.Resize<double>(ref imageNorm, originalLength + letterNorm.Length);
-            Array.Copy(letterNorm, 0, imageNorm, originalLength, letterNorm.Length);
             return imageNorm;
         }
 
@@ -117,14 +123,14 @@ namespace ProjektSSI
             for (int i = 0; i < length; i++)
             {
                 TrainingValues[i] = new double[1024];
-                for (int j = 0; j < 1024; j++)
+                for (int j = 0; j < 784; j++)
                 {
                     TrainingValues[i][j] = learn[i][j];
                 }
 
                 TrainingTargets[i] = new double[26];
                 int k = 0;
-                for (int j = 1024; j < 1050; j++)
+                for (int j = 784; j < 810; j++)
                 {
                     TrainingTargets[i][k] = learn[i][j];
                     k++;
@@ -139,14 +145,14 @@ namespace ProjektSSI
             for (int i = 0; i < length; i++)
             {
                 TestValues[i] = new double[1024];
-                for (int j = 0; j < 1024; j++)
+                for (int j = 0; j < 784; j++)
                 {
                     TestValues[i][j] = learn[i][j];
                 }
 
                 TestTargets[i] = new double[26];
                 int k = 0;
-                for (int j = 1024; j < 1050; j++)
+                for (int j = 784; j < 810; j++)
                 {
                     TestTargets[i][k] = learn[i][j];
                     k++;
@@ -165,6 +171,34 @@ namespace ProjektSSI
                 double[] t = data[r];
                 data[r] = data[i];
                 data[i] = t;
+            }
+        }
+
+        public void Shuffle()
+        {
+            Random rnd = new Random();
+            int n = this.TrainingValues.Length;
+            for (int i = 0; i < (n - 1); i++)
+            {
+                int r = i + rnd.Next(n - i);
+                double[] t0 = this.TrainingValues[r];
+                double[] t1 = this.TrainingTargets[r];
+                this.TrainingValues[r] = this.TrainingValues[i];
+                this.TrainingTargets[r] = this.TrainingTargets[i];
+                this.TrainingValues[i] = t0;
+                this.TrainingTargets[i] = t1;
+            }
+
+            n = this.TestTargets.Length;
+            for (int i = 0; i < (n - 1); i++)
+            {
+                int r = i + rnd.Next(n - i);
+                double[] t0 = this.TestValues[r];
+                double[] t1 = this.TestTargets[r];
+                this.TestValues[r] = this.TestValues[i];
+                this.TestTargets[r] = this.TestTargets[i];
+                this.TestValues[i] = t0;
+                this.TestTargets[i] = t1;
             }
         }
         #endregion

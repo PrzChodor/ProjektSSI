@@ -80,7 +80,7 @@ namespace ProjektSSI
                     {
                         ForwardPropagate(dataSet.TrainingValues[j]);
                         BackPropagate(dataSet.TrainingTargets[j]);
-                        pbar.Tick("Training: Step " + j + " of " + totalTicks);
+                        pbar.Tick("Training: Step " + (j + 1) + " of " + totalTicks);
                     }
                 }
 
@@ -94,8 +94,7 @@ namespace ProjektSSI
                     Console.WriteLine($"   End of epoch {i + 1}");
                     Console.WriteLine($"   Accuracy = {currentError[0] * 100:F4}%");
                     Console.WriteLine($"   RMSE = {currentError[1]}");
-                    LoadWeights();
-                    break;
+                    return;
                 }
 
                 lastWeights = CurrentWeights();
@@ -107,6 +106,7 @@ namespace ProjektSSI
                 Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
                 Console.WriteLine($"   RMSE = {lowestError[1]}");
                 Console.WriteLine();
+                dataSet.Shuffle();
             }
 
             SaveWeights(lastWeights);
@@ -131,6 +131,7 @@ namespace ProjektSSI
             while (maximumError < lowestError[1])
             {
                 int totalTicks = dataSet.TrainingValues.Length;
+                int errors = 0;
 
                 var options = new ProgressBarOptions
                 {
@@ -143,7 +144,7 @@ namespace ProjektSSI
                     {
                         ForwardPropagate(dataSet.TrainingValues[j]);
                         BackPropagate(dataSet.TrainingTargets[j]);
-                        pbar.Tick("Training: Step " + j + " of " + totalTicks);
+                        pbar.Tick("Training: Step " + (j + 1) + " of " + totalTicks);
                     }
                 }
 
@@ -152,12 +153,20 @@ namespace ProjektSSI
                 //Jeśli obency błąd jest większy niż poprzedni to koniec treningu
                 if (lowestError[1] < currentError[1])
                 {
-                    SaveWeights(lastWeights);
                     Console.WriteLine();
                     Console.WriteLine($"   End of epoch {epoch}");
                     Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
                     Console.WriteLine($"   RMSE = {lowestError[1]}");
-                    return;
+                    LoadWeights();
+                    errors++;
+                    if (errors == 15)
+                    {
+                        errors = 0;
+                        LearningRate /= 10;
+                        if (LearningRate <= 0.00001)
+                            return;
+                    }
+                    continue;
                 }
 
                 lastWeights = CurrentWeights();
@@ -170,6 +179,7 @@ namespace ProjektSSI
                 Console.WriteLine($"   RMSE = {lowestError[1]}");
                 Console.WriteLine();
 
+                dataSet.Shuffle();
                 epoch++;
             }
             SaveWeights(lastWeights);
@@ -202,7 +212,7 @@ namespace ProjektSSI
                         error += Math.Pow(result[j] - dataSet.TestTargets[i][j], 2);
                     if (result.IndexOf(result.Max()) == expected.IndexOf(expected.Max()))
                         goodValues++;
-                    pbar.Tick("Testing: Step " + i + " of " + totalTicks);
+                    pbar.Tick("Testing: Step " + (i + 1) + " of " + totalTicks);
                 }
             }
 
