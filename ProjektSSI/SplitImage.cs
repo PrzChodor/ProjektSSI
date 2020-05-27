@@ -50,7 +50,7 @@ namespace ProjektSSI
 
             Bitmap bitmap = new Bitmap(label.GetLength(1),label.GetLength(0));
 
-            for (int i = 0; i < label.GetLength(0); i++)
+            /*for (int i = 0; i < label.GetLength(0); i++)
             {
                 for (int j = 0; j < label.GetLength(1); j++)
                 {
@@ -58,7 +58,7 @@ namespace ProjektSSI
                     bitmap.SetPixel(j, i, Color.FromArgb(color, color, color));
                 }
             }
-            bitmap.Save("color.png");
+            bitmap.Save("color.png");*/
 
             var minX = new Dictionary<int, int>();
             var minY = new Dictionary<int, int>();
@@ -116,8 +116,8 @@ namespace ProjektSSI
                     graphics.InterpolationMode = InterpolationMode.High;
                     graphics.Clear(Color.Black);
                     graphics.DrawImage(cropped, 1, 1, 26, 26);
-                    resized.Save(i + ".png");
                     imageWithMinX.Add(resized,minX[i]);
+                    //resized.Save(i + ".png");
                 }
             }
             var imageOrder = imageWithMinX.OrderBy(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
@@ -146,10 +146,13 @@ namespace ProjektSSI
 
             if (pixels[(y - 1) * stride + x] != 0 && labels[y - 1, x1] == 0)
                 findNeighbors(pixels, labels, x, y - 1, bytesPerPixel, stride, label);
+
             if (pixels[(y + 1) * stride + x] != 0 && labels[y + 1, x1] == 0)
                 findNeighbors(pixels, labels, x, y + 1, bytesPerPixel, stride, label);
+
             if (pixels[y * stride + x - bytesPerPixel] != 0 && labels[y, x1 - 1] == 0)
                 findNeighbors(pixels, labels, x - bytesPerPixel, y, bytesPerPixel, stride, label);
+
             if (pixels[y * stride + x + bytesPerPixel] != 0 && labels[y, x1 + 1] == 0)
                 findNeighbors(pixels, labels, x + bytesPerPixel, y, bytesPerPixel, stride, label);
         }
