@@ -38,60 +38,27 @@ namespace ProjektSSI
                 int currentLine = y * bitmapData.Stride;
                 for (int x = bytesPerPixel; x < widthInBytes - 1; x = x + bytesPerPixel)
                 {
-                    if (pixels[currentLine + x] != 0)
+                    if (pixels[currentLine + x] != 0 && label[y, x / bytesPerPixel] == 0)
                     {
-                        int x1 = x / bytesPerPixel;
-
-                        if (pixels[currentLine + x - bytesPerPixel] != 0)
-                        {
-                            label[y, x1] = label[y, x1 - 1];
-                            if (pixels[currentLine + x - bitmapData.Stride] != 0 && label[y - 1, x1] != label[y, x1 - 1])
-                                if (!dictionary.ContainsKey(label[y - 1, x1]))
-                                {
-                                    if (dictionary.ContainsValue(label[y - 1, x1]))
-                                        foreach (var key in dictionary.Keys.ToList())
-                                            if (dictionary[key] == label[y - 1, x1])
-                                                dictionary[key] = label[y, x1 - 1];
-                                    dictionary.Add(label[y - 1, x1], label[y, x1 - 1]);
-                                }
-                        }
-                        else if (pixels[currentLine + x - bitmapData.Stride] != 0)
-                            label[y, x1] = label[y - 1, x1];
-                        else
-                        {
-                            label[y, x1] = currentLabel;
-                            currentLabel++;
-                        }
+                        findNeighbors(pixels, label, x, y, bytesPerPixel, bitmapData.Stride, currentLabel);
+                        currentLabel++;
                     }
                 }
             }
 
             image.UnlockBits(bitmapData);
 
-            var finalKeys = dictionary.Values.Distinct().ToList();
-            for (int i = 0; i < finalKeys.Count; i++)
-            {
-                foreach (var key in dictionary.Keys.ToList())
-                    if (dictionary[key] == finalKeys[i])
-                        dictionary[key] = i + 1;
-                dictionary.Add(finalKeys[i], i + 1);
-            }
+            Bitmap bitmap = new Bitmap(label.GetLength(1),label.GetLength(0));
 
-            for (int y = 1; y < heightInPixels - 1; y++)
+            for (int i = 0; i < label.GetLength(0); i++)
             {
-                int currentLine = y * bitmapData.Stride;
-                for (int x = bytesPerPixel; x < widthInBytes - 1; x = x + bytesPerPixel)
+                for (int j = 0; j < label.GetLength(1); j++)
                 {
-                    if (pixels[currentLine + x] != 0)
-                    {
-                        int x1 = x / bytesPerPixel;
-                        if (dictionary.ContainsKey(label[y, x1]))
-                            label[y, x1] = dictionary[label[y, x1]];
-                    }
+                    int color = (int)(255 * (label[i, j] / (double)(currentLabel-1)));
+                    bitmap.SetPixel(j, i, Color.FromArgb(color, color, color));
                 }
             }
-
-
+            bitmap.Save("color.png");
 
             var minX = new Dictionary<int, int>();
             var minY = new Dictionary<int, int>();
@@ -129,7 +96,7 @@ namespace ProjektSSI
                 }
             }
 
-            var images = new List<Bitmap>();
+            var imageWithMinX = new Dictionary<Bitmap, int>();
 
             foreach (var i in minX.Keys)
             {
@@ -149,9 +116,12 @@ namespace ProjektSSI
                     graphics.InterpolationMode = InterpolationMode.High;
                     graphics.Clear(Color.Black);
                     graphics.DrawImage(cropped, 1, 1, 26, 26);
-                    images.Add(resized);
+                    resized.Save(i + ".png");
+                    imageWithMinX.Add(resized,minX[i]);
                 }
             }
+            var imageOrder = imageWithMinX.OrderBy(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            var images = imageOrder.Keys.ToList();
 
             return images;
         }
@@ -167,6 +137,21 @@ namespace ProjektSSI
                 graphics.DrawImage(image, x, y);
             }
             return newImage;
+        }
+
+        static void findNeighbors(byte[] pixels, int[,] labels, int x, int y, int bytesPerPixel, int stride, int label)
+        {
+            int x1 = x / bytesPerPixel;
+            labels[y, x1] = label;
+
+            if (pixels[(y - 1) * stride + x] != 0 && labels[y - 1, x1] == 0)
+                findNeighbors(pixels, labels, x, y - 1, bytesPerPixel, stride, label);
+            if (pixels[(y + 1) * stride + x] != 0 && labels[y + 1, x1] == 0)
+                findNeighbors(pixels, labels, x, y + 1, bytesPerPixel, stride, label);
+            if (pixels[y * stride + x - bytesPerPixel] != 0 && labels[y, x1 - 1] == 0)
+                findNeighbors(pixels, labels, x - bytesPerPixel, y, bytesPerPixel, stride, label);
+            if (pixels[y * stride + x + bytesPerPixel] != 0 && labels[y, x1 + 1] == 0)
+                findNeighbors(pixels, labels, x + bytesPerPixel, y, bytesPerPixel, stride, label);
         }
     }
 }
