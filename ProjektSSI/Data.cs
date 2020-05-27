@@ -87,9 +87,36 @@ namespace ProjektSSI
             }
         }
 
-        public double[] ConvertImage(string file)
+        public double[] ConvertImage(string path)
         {
-            var image = new Bitmap(file);
+            Bitmap image; 
+            using (var temp = new Bitmap(path))
+            {
+                image = new Bitmap(temp);
+            }
+            var imageNorm = new double[784];
+
+            BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
+                ImageLockMode.ReadWrite, image.PixelFormat);
+            int byteCount = bitmapData.Stride * image.Height;
+            byte[] pixels = new byte[byteCount];
+            IntPtr ptrFirstPixel = bitmapData.Scan0;
+            Marshal.Copy(ptrFirstPixel, pixels, 0, pixels.Length);
+
+            int j = 0;
+
+            for (int i = 0; i < pixels.Length; i += 4)
+            {
+                imageNorm[j] = (double)pixels[i] / 255;
+                j++;
+            }
+
+            image.UnlockBits(bitmapData);
+
+            return imageNorm;
+        }
+        public double[] ConvertImage(Bitmap image)
+        {
             var imageNorm = new double[784];
 
             BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),

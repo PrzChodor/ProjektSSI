@@ -123,6 +123,7 @@ namespace ProjektSSI
             var lastWeights = CurrentWeights();
             var lowestError = Test(dataSet);
             int epoch = 1;
+            int errors = 0;
 
             Console.WriteLine();
             Console.WriteLine($"   Accuracy = {lowestError[0] * 100:F4}%");
@@ -132,7 +133,6 @@ namespace ProjektSSI
             while (maximumError < lowestError[1])
             {
                 int totalTicks = dataSet.TrainingValues.Length;
-                int errors = 0;
 
                 var options = new ProgressBarOptions
                 {
