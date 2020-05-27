@@ -19,10 +19,11 @@ namespace ProjektSSI
             {
                 string output = "";
                 var path = Console.ReadLine();
+                SplitImage split = new SplitImage();
 
                 if (File.Exists(path))
                 {
-                    foreach (var image in SplitImage.Split(path))
+                    foreach (var image in split.Split(path))
                     {
                         char[] alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
                         var result = network.Compute(data.ConvertImage(image));

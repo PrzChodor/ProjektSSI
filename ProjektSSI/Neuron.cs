@@ -56,7 +56,7 @@ namespace ProjektSSI
             return target - Value;
         }
 
-        //Obliczanie gradientu błedu
+        //Obliczanie gradientu
         public double CalculateGradient(double? target = null)
         {
             //Dla neuronów warstw ukrytych
