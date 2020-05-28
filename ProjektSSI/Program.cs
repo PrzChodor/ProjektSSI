@@ -9,21 +9,26 @@ namespace ProjektSSI
         static void Main(string[] args)
         {
             Data data = new Data();
-            //data.LoadData();
+            //Wczytanie bazy danych do uczenia sieci neuronowej
+            data.LoadData();
 
             Network network = new Network(784, new int []{ 100, 100, 100, 100, 100, 100}, 26, 0.01, 0.99);
+            //Wczytanie wag
             network.LoadWeights();
-            //network.Train(data, 0.001);
+
+            //Uczenie sieci neuronowej do końcowego błedu poniżej 0.001
+            network.Train(data, 0.001);
+
             Console.WriteLine("Podaj ścieżkę do obrazka z tekstem:");
             while (true)
             {
                 string output = "";
                 var path = Console.ReadLine();
-                SplitImage split = new SplitImage();
 
                 if (File.Exists(path))
                 {
-                    foreach (var image in split.Split(path))
+                    //Podział obrazu na mniejsze części z literami i przesłanie ich do sieci neuronowej
+                    foreach (var image in SplitImage.Split(path))
                     {
                         char[] alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
                         var result = network.Compute(data.ConvertImage(image));

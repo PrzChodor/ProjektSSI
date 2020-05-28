@@ -20,7 +20,7 @@ namespace ProjektSSI
 
         #region Methods
 
-        //Wczytywanie danych z pliku
+        //Wczytywanie danych z plików
         public void LoadData()
         {
             int totalTicks = Directory.GetFiles(@"../../../data/train", "*.png", SearchOption.AllDirectories).Length;
@@ -36,6 +36,7 @@ namespace ProjektSSI
             {
                 var imagesLearnList = new List<double[]>();
 
+                //Wczytanie wszystkich obrazów do treningu
                 var directories = Directory.GetDirectories(@"../../../data/train");
                 foreach (var d in directories)
                 {
@@ -58,6 +59,7 @@ namespace ProjektSSI
 
                 var imagesTestList = new List<double[]>();
 
+                //Wczytanie wszystkich obrazów do testowania
                 directories = Directory.GetDirectories(@"../../../data/test");
                 foreach (var d in directories)
                 {
@@ -81,12 +83,12 @@ namespace ProjektSSI
                 var imagesLearn = imagesLearnList.ToArray();
                 var imagesTest = imagesTestList.ToArray();
 
-                Shuffle(imagesLearn);
-                Shuffle(imagesTest);
                 Split(imagesLearn, imagesTest);
+                Shuffle();
             }
         }
 
+        //Wczytanie obrazu z pliku i zamiana go na tablicę jednowymiarową wartości 0-1
         public double[] ConvertImage(string path)
         {
             Bitmap image; 
@@ -115,6 +117,8 @@ namespace ProjektSSI
 
             return imageNorm;
         }
+
+        //Zamiana obrazu z bitmapy na tablicę jednowymiarową wartości 0-1
         public double[] ConvertImage(Bitmap image)
         {
             var imageNorm = new double[784];
@@ -188,19 +192,6 @@ namespace ProjektSSI
         }
 
         //Przetasowanie danych
-        public void Shuffle(double [][] data)
-        {
-            Random rnd = new Random();
-            int n = data.Length;
-            for (int i = 0; i < (n - 1); i++)
-            {
-                int r = i + rnd.Next(n - i);
-                double[] t = data[r];
-                data[r] = data[i];
-                data[i] = t;
-            }
-        }
-
         public void Shuffle()
         {
             Random rnd = new Random();

@@ -90,7 +90,6 @@ namespace ProjektSSI
                 //Jeśli obency błąd jest większy niż poprzedni to koniec treningu
                 if (lowestError[1] < currentError[1])
                 {
-                    SaveWeights(lastWeights);
                     Console.WriteLine();
                     Console.WriteLine($"   End of epoch {i + 1}");
                     Console.WriteLine($"   Accuracy = {currentError[0] * 100:F4}%");
@@ -151,7 +150,7 @@ namespace ProjektSSI
 
                 var currentError = Test(dataSet);
 
-                //Jeśli obency błąd jest większy niż poprzedni to koniec treningu
+                //Jeśli obency błąd jest większy niż poprzedni dwa razy z rzędu to zmniejsz learning rate 10-krotnie
                 if (lowestError[1] < currentError[1])
                 {
                     Console.WriteLine();
@@ -229,7 +228,7 @@ namespace ProjektSSI
             OutputLayer.ForEach(a => a.CalculateValue());
         }
 
-        //Zaktualizowanie wag
+        //Obliczenie gradientów i zaktualizowanie wag
         private void BackPropagate(double[] targets)
         {
             var i = 0;

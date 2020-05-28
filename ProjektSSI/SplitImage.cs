@@ -11,16 +11,12 @@ namespace ProjektSSI
 {
     class SplitImage
     {
-        byte[] pixels;
-        int[,] labels;
-        int bytesPerPixel;
-        int stride;
-        int currentLabel;
-
-        public List<Bitmap> Split(string path)
+        //Podział obrazu na mniejsze części z literami
+        public static List<Bitmap> Split(string path)
         {
             Bitmap image;
 
+            //Dodanie czarnej obwódki do obrazu w celu zmniejszenia ilości warunków podczas wyszukiwania liter
             using (var temp = new Bitmap(path))
             {
                 image = AddBorder(temp, 1);
@@ -28,18 +24,19 @@ namespace ProjektSSI
 
             BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height),
                 ImageLockMode.ReadWrite, image.PixelFormat);
-            bytesPerPixel = System.Drawing.Bitmap.GetPixelFormatSize(image.PixelFormat) / 8;
-            stride = bitmapData.Stride;
+            int bytesPerPixel = System.Drawing.Bitmap.GetPixelFormatSize(image.PixelFormat) / 8;
+            int stride = bitmapData.Stride;
             int byteCount = stride * image.Height;
-            pixels = new byte[byteCount];
+            byte[] pixels = new byte[byteCount];
             IntPtr ptrFirstPixel = bitmapData.Scan0;
             Marshal.Copy(ptrFirstPixel, pixels, 0, pixels.Length);
             int heightInPixels = bitmapData.Height;
             int widthInBytes = bitmapData.Width * bytesPerPixel;
-            labels = new int[bitmapData.Height, bitmapData.Width];
-            currentLabel = 1;
+            int[,] labels = new int[bitmapData.Height, bitmapData.Width];
+            int currentLabel = 1;
             var dictionary = new Dictionary<int, int>();
 
+            //Znalezienie liter i wszystkich pixeli do nich należących
             for (int y = 1; y < heightInPixels - 1; y++)
             {
                 int currentLine = y * stride;
@@ -47,7 +44,7 @@ namespace ProjektSSI
                 {
                     if (pixels[currentLine + x] != 0 && labels[y, x / bytesPerPixel] == 0)
                     {
-                        findNeighbors(x, y);
+                        findNeighbors(x, y, bytesPerPixel, currentLabel, stride, labels, pixels);
                         currentLabel++;
                     }
                 }
@@ -55,7 +52,8 @@ namespace ProjektSSI
 
             image.UnlockBits(bitmapData);
 
-            Bitmap bitmap = new Bitmap(labels.GetLength(1), labels.GetLength(0));
+            //Zaznaczenie poszczególnych liter i zapisanie jako nowy obraz
+            /*Bitmap bitmap = new Bitmap(labels.GetLength(1), labels.GetLength(0));
             Random rnd = new Random();
             List<Color> colors = new List<Color>();
             colors.Add(Color.Black);
@@ -71,8 +69,9 @@ namespace ProjektSSI
                     bitmap.SetPixel(j, i, colors[labels[i,j]]);
                 }
             }
-            bitmap.Save("color.png");
+            bitmap.Save("characters.png");*/
 
+            //Wyznaczenie punktów końcowych poszczególnych liter
             var minX = new Dictionary<int, int>();
             var minY = new Dictionary<int, int>();
             var maxX = new Dictionary<int, int>();
@@ -111,10 +110,12 @@ namespace ProjektSSI
 
             var imageWithMinX = new Dictionary<Bitmap, int>();
 
+            //Dla każdej litery wycięcie i przeskalowanie obrazu z nią 
             foreach (var i in minX.Keys)
             {
                 int length = Math.Max(maxX[i] - minX[i], maxY[i] - minY[i]) + 1;
 
+                //Wycięcie obrazu z literą
                 Bitmap cropped = new Bitmap(length, length);
                 using (Graphics graphics = Graphics.FromImage(cropped))
                 {
@@ -123,6 +124,7 @@ namespace ProjektSSI
                     graphics.DrawImage(image, (length - (maxX[i] - minX[i] + 1)) / 2.0f, (length - (maxY[i] - minY[i] + 1)) / 2.0f, srcRect, GraphicsUnit.Pixel);
                 }
 
+                //Przeskalowanie obrazu do 28x28
                 Bitmap resized = new Bitmap(28, 28);
                 using (Graphics graphics = Graphics.FromImage(resized))
                 {
@@ -130,15 +132,17 @@ namespace ProjektSSI
                     graphics.Clear(Color.Black);
                     graphics.DrawImage(cropped, 1, 1, 26, 26);
                     imageWithMinX.Add(resized,minX[i]);
+                    //Zapisanie obrazów z pojedyńczymi literami
                     resized.Save(i + ".png");
                 }
             }
+            //Ustwaienie odpowedniej kolejności liter
             var imageOrder = imageWithMinX.OrderBy(x => x.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
             var images = imageOrder.Keys.ToList();
-
             return images;
         }
 
+        //Dodanie obwódki do obrazu
         static Bitmap AddBorder(Bitmap image, int thickness)
         {
             Bitmap newImage = new Bitmap(image.Width + 2 * thickness, image.Height + 2 * thickness);
@@ -152,7 +156,8 @@ namespace ProjektSSI
             return newImage;
         }
 
-        void findNeighbors(int x, int y)
+        //Znajduje wszystkie nieczarne pixele połączone z podanym i przypisuje im tą samą wartość
+        static void findNeighbors(int x, int y, int bytesPerPixel,int currentLabel,int stride, int[,] labels, byte[] pixels)
         {
             Stack<int[]> stack = new Stack<int[]>();
             stack.Push(new int[] { x, y });

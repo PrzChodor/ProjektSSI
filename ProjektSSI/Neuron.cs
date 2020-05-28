@@ -50,7 +50,7 @@ namespace ProjektSSI
             return Value = ActivationFunction.Output(InputSynapses.Sum(a => a.Weight * a.InputNeuron.Value) + Bias);
         }
 
-        //Obliczanie błedu na wyjściu sieci
+        //Obliczanie błedu na wyjściu neuronu
         public double CalculateError(double target)
         {
             return target - Value;
@@ -67,7 +67,7 @@ namespace ProjektSSI
             return Gradient = CalculateError(target.Value) * ActivationFunction.Derivative(Value);
         }
 
-        //Aktualizacja wag
+        //Aktualizacja wag i biasu
         public void UpdateWeights(double learnRate, double momentum)
         {
             var prevDelta = BiasDelta;
