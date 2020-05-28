@@ -33,7 +33,7 @@ namespace ProjektSSI
                 ProgressBarOnBottom = true
             };
 
-            using (var pbar = new ProgressBar(totalTicks, "Creating data...", options))
+            using (var pbar = new ProgressBar(totalTicks, "Loading data...", options))
             {
                 var imagesLearnList = new List<double[]>();
 
@@ -120,7 +120,7 @@ namespace ProjektSSI
         }
 
         //Zamiana obrazu z bitmapy na tablicę jednowymiarową wartości 0-1
-        public double[] ConvertImage(Bitmap image)
+        public static double[] ConvertImage(Bitmap image)
         {
             var imageNorm = new double[784];
 

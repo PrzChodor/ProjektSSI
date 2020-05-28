@@ -10,7 +10,7 @@ using System.Drawing.Drawing2D;
 
 namespace ProjektSSI
 {
-    class SplitImage
+    static class SplitImage
     {
         //Podział obrazu na mniejsze części z literami
         public static List<Bitmap> Split(string path)
@@ -53,7 +53,7 @@ namespace ProjektSSI
 
             image.UnlockBits(bitmapData);
 
-            //Zaznaczenie poszczególnych liter i zapisanie jako nowy obraz
+            //Zaznaczenie liter kolorami i zapisanie jako nowy obraz
             /*Bitmap bitmap = new Bitmap(labels.GetLength(1), labels.GetLength(0));
             Random rnd = new Random();
             List<Color> colors = new List<Color>();
