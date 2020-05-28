@@ -54,7 +54,7 @@ namespace ProjektSSI
             image.UnlockBits(bitmapData);
 
             //Zaznaczenie liter kolorami i zapisanie jako nowy obraz
-            /*Bitmap bitmap = new Bitmap(labels.GetLength(1), labels.GetLength(0));
+            Bitmap bitmap = new Bitmap(labels.GetLength(1), labels.GetLength(0));
             Random rnd = new Random();
             List<Color> colors = new List<Color>();
             colors.Add(Color.Black);
@@ -67,10 +67,10 @@ namespace ProjektSSI
             {
                 for (int j = 0; j < labels.GetLength(1); j++)
                 {
-                    bitmap.SetPixel(j, i, colors[labels[i,j]]);
+                    bitmap.SetPixel(j, i, colors[labels[i, j]]);
                 }
             }
-            bitmap.Save("characters.png");*/
+            bitmap.Save("characters.png");
 
             //Wyznaczenie punktów końcowych poszczególnych liter
             var minX = new Dictionary<int, int>();
@@ -134,7 +134,7 @@ namespace ProjektSSI
                     graphics.DrawImage(cropped, 1, 1, 26, 26);
                     imageWithMinX.Add(resized,minX[i]);
                     //Zapisanie obrazów z pojedyńczymi literami
-                    //resized.Save(i + ".png");
+                    resized.Save(i + ".png");
                 }
             }
             //Ustwaienie odpowedniej kolejności liter
