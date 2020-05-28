@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
@@ -133,7 +134,7 @@ namespace ProjektSSI
                     graphics.DrawImage(cropped, 1, 1, 26, 26);
                     imageWithMinX.Add(resized,minX[i]);
                     //Zapisanie obrazów z pojedyńczymi literami
-                    resized.Save(i + ".png");
+                    //resized.Save(i + ".png");
                 }
             }
             //Ustwaienie odpowedniej kolejności liter

@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace ProjektSSI
 {
     public class Synapse
